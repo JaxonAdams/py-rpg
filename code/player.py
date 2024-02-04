@@ -59,10 +59,10 @@ class Player(Entity):
         self.energy = self.stats["energy"]
         self.exp = 123
 
-        # TODO: REMOVE ME
-        self.health *= 0.65 # testing out partial status bar
-        self.energy *= 0.8
-        # TODO: REMOVE ME
+        # damage / vulnerability timer
+        self.vulnerable = True
+        self.hurt_time = None
+        self.invulnerability_duration = 500
 
     def import_player_assets(self):
         """Load in all assets related to the player"""
@@ -182,7 +182,8 @@ class Player(Entity):
 
         # attack cooldown
         if self.attacking:
-            if current_time - self.attack_time >= self.attack_cooldown:
+            if ((current_time - self.attack_time) 
+            >= (self.attack_cooldown + weapon_data[self.weapon]["cooldown"])):
                 self.attacking = False
                 self.destroy_weapon()
 
@@ -195,6 +196,19 @@ class Player(Entity):
         if not self.can_switch_spell:
             if current_time - self.spell_switch_time >= self.switch_duration_cooldown:
                 self.can_switch_spell = True
+
+        # vulnerability timer
+        if not self.vulnerable:
+            if current_time - self.hurt_time >= self.invulnerability_duration:
+                self.vulnerable = True
+
+    def get_full_weapon_dmg(self):
+        """Calculate the full damage the player can deal with their weapon."""
+
+        base_damage = self.stats["attack"]
+        weapon_damage = weapon_data[self.weapon]["damage"]
+
+        return base_damage + weapon_damage
 
     def animate(self):
         """Manage the player animation."""
@@ -209,6 +223,13 @@ class Player(Entity):
         # set the image
         self.image = animation[int(self.frame_index)]
         self.rect = self.image.get_rect(center=self.hitbox.center)
+
+        # flicker when hit
+        if not self.vulnerable:
+            alpha = self.wave_value()
+            self.image.set_alpha(alpha)
+        else:
+            self.image.set_alpha(255)
 
     def update(self):
         """Collect input and update the player position."""

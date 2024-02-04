@@ -2,6 +2,7 @@
 player or an enemy.
 """
 
+from math import sin
 
 import pygame
 
@@ -40,7 +41,6 @@ class Entity(pygame.sprite.Sprite):
                     if self.direction.y < 0: # moving up
                         self.hitbox.top = sprite.hitbox.bottom
 
-
     def move(self, speed):
         """Move the entity, checking for collisions along the way."""
 
@@ -56,3 +56,8 @@ class Entity(pygame.sprite.Sprite):
 
         # move sprite to new hitbox location
         self.rect.center = self.hitbox.center
+
+    def wave_value(self):
+        """Use a sign wave to toggle between 255 and 0."""
+
+        return 255 if sin(pygame.time.get_ticks()) >= 0 else 0

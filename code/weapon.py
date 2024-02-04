@@ -14,6 +14,8 @@ class Weapon(pygame.sprite.Sprite):
         offset_h = pygame.math.Vector2(0,16)
         offset_v = pygame.math.Vector2(-10,0)
 
+        self.sprite_type = "weapon"
+
         # graphic
         full_path = f"../graphics/weapons/{player.weapon}/{direction}.png"
         self.image = pygame.image.load(full_path).convert_alpha()

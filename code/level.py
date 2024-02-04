@@ -30,6 +30,8 @@ class Level:
 
         # attack sprites
         self.current_attack = None
+        self.attack_sprites = pygame.sprite.Group()
+        self.attackable_sprites = pygame.sprite.Group()
 
         # draw all sprites in map
         self.create_map()
@@ -64,8 +66,13 @@ class Level:
                             Tile((x, y), [self.obstacle_sprites], "invisible")
                         if style == "grass":
                             grass_img = random.choice(graphics["grass"])
-                            Tile((x, y), [self.visible_sprites, self.obstacle_sprites], 
-                                 "grass", grass_img)
+
+                            Tile(
+                                (x, y),
+                                [self.visible_sprites, self.obstacle_sprites, self.attackable_sprites], 
+                                "grass",
+                                grass_img
+                            )
                         if style == "large_object":
                             obj_img = graphics["large_objects"][int(col)]
                             Tile((x, y), [self.visible_sprites, self.obstacle_sprites], 
@@ -82,13 +89,17 @@ class Level:
                                 elif col == "392": monster_name = "raccoon"
                                 else: monster_name = "squid"
 
-                                Enemy(monster_name, (x, y), [self.visible_sprites], 
-                                      self.obstacle_sprites)
+                                Enemy(
+                                    monster_name,
+                                    (x, y),
+                                    [self.visible_sprites, self.attackable_sprites],
+                                    self.obstacle_sprites, self.damage_player
+                                )
 
     def create_weapon(self):
         """Create a weapon and draw it on the screen."""
 
-        self.current_attack = Weapon(self.player, [self.visible_sprites])
+        self.current_attack = Weapon(self.player, [self.visible_sprites, self.attack_sprites])
 
     def destroy_weapon(self):
         """Remove a weapon from the screen."""
@@ -109,12 +120,46 @@ class Level:
 
         pass
 
+    def run_attack_logic(self):
+        """Check if an attack sprite is colliding with an attackable sprite.
+        If so, handle the logic for an attackable being hit.
+        """
+
+        for attack_sprite in self.attack_sprites:
+            # spritecollide() -- checks if the sprite collides with any sprite in the group
+            collision_sprites = pygame.sprite.spritecollide(
+                attack_sprite,
+                self.attackable_sprites,
+                False,
+            )
+
+            # for each collision found...
+            for target_sprite in collision_sprites:
+                if target_sprite.sprite_type == "grass":
+                    # destroy the grass
+                    target_sprite.kill()
+                else: # must be an enemy
+                    target_sprite.get_damage(self.player, attack_sprite.sprite_type)
+
+    def damage_player(self, amount, attack_type):
+        """Deal damage to the player."""
+
+        if not self.player.vulnerable:
+            return
+        
+        self.player.health -= amount
+        self.player.vulnerable = False
+        self.player.hurt_time = pygame.time.get_ticks()
+
+        # TODO: spawn particles
+
     def run(self):
         """Update and draw the level"""
 
         self.visible_sprites.custom_draw(self.player)
         self.visible_sprites.update()
         self.visible_sprites.enemy_update(self.player)
+        self.run_attack_logic()
         self.ui.display(self.player)
 
 
