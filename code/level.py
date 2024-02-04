@@ -16,6 +16,7 @@ from player import Player
 from enemy import Enemy
 from weapon import Weapon
 from ui import UI
+from particles import AnimationPlayer, ParticleEffect
 
 class Level:
     """A level in the game."""
@@ -38,6 +39,9 @@ class Level:
 
         # user interface
         self.ui = UI()
+
+        # particles
+        self.animation_player = AnimationPlayer()
 
     def create_map(self):
         """Create the level map."""
@@ -136,6 +140,10 @@ class Level:
             # for each collision found...
             for target_sprite in collision_sprites:
                 if target_sprite.sprite_type == "grass":
+                    # run particle effect
+                    pos = target_sprite.rect.center
+                    self.animation_player.create_grass_particles(pos, [self.visible_sprites])
+                    
                     # destroy the grass
                     target_sprite.kill()
                 else: # must be an enemy
