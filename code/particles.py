@@ -66,6 +66,12 @@ class AnimationPlayer:
         animation_frames = random.choice(self.frames["leaf"])
         ParticleEffect(pos, animation_frames, groups)
 
+    def create_particles(self, animation_type, pos, groups):
+        """Create particle effects based on the provided animation type."""
+
+        animation_frames = self.frames[animation_type]
+        ParticleEffect(pos, animation_frames, groups)
+
 class ParticleEffect(pygame.sprite.Sprite):
     """A particle effect; i.e. spell effects, etc."""
 
@@ -78,6 +84,8 @@ class ParticleEffect(pygame.sprite.Sprite):
 
         self.image = self.frames[self.frame_index]
         self.rect = self.image.get_rect(center=pos)
+
+        self.sprite_type = "magic"
 
     def animate(self):
         """Handle the animation of a particle effect."""

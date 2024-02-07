@@ -11,7 +11,7 @@ from entity import Entity
 class Enemy(Entity):
     """An enemy in the game."""
 
-    def __init__(self, monster_name, pos, groups, obstacle_sprites, damage_player):
+    def __init__(self, monster_name, pos, groups, obstacle_sprites, damage_player, trigger_death_particles):
         super().__init__(groups)
 
         # general setup
@@ -45,6 +45,7 @@ class Enemy(Entity):
         self.atack_time = None
         self.attack_cooldown = 400
         self.damage_player = damage_player
+        self.trigger_death_particles = trigger_death_particles
 
         # invincibility timer
         self.vulnerable = True
@@ -149,7 +150,7 @@ class Enemy(Entity):
         if attack_type == "weapon":
             self.health -= player.get_full_weapon_dmg()
         else: # magic damage
-            pass
+            self.health -= player.get_full_spell_dmg()
 
         self.hit_time = pygame.time.get_ticks()
         self.vulnerable = False
@@ -159,6 +160,7 @@ class Enemy(Entity):
 
         if self.health <= 0:
             self.kill()
+            self.trigger_death_particles(self.rect.center, self.monster_name)
 
     def hit_reaction(self):
         """If just attacked, get knocked back."""

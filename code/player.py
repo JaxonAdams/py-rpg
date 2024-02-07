@@ -210,6 +210,22 @@ class Player(Entity):
 
         return base_damage + weapon_damage
 
+    def get_full_spell_dmg(self):
+        """Calculate the full damage the player can deal with their spell."""
+
+        base_damage = self.stats["magic"]
+        spell_damage = magic_data[self.spell]["strength"]
+
+        return base_damage + spell_damage
+
+    def recover_energy(self):
+        """Increase the player's energy level."""
+
+        if self.energy < self.stats["energy"]:
+            self.energy += (0.01 * self.stats["magic"])
+        else:
+            self.energy = self.stats["energy"]
+
     def animate(self):
         """Manage the player animation."""
 
@@ -239,3 +255,4 @@ class Player(Entity):
         self.set_status()
         self.animate()
         self.move(self.speed)
+        self.recover_energy()

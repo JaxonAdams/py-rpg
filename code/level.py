@@ -16,7 +16,8 @@ from player import Player
 from enemy import Enemy
 from weapon import Weapon
 from ui import UI
-from particles import AnimationPlayer, ParticleEffect
+from particles import AnimationPlayer
+from magic import MagicPlayer
 
 class Level:
     """A level in the game."""
@@ -42,6 +43,7 @@ class Level:
 
         # particles
         self.animation_player = AnimationPlayer()
+        self.magic_player = MagicPlayer(self.animation_player)
 
     def create_map(self):
         """Create the level map."""
@@ -97,7 +99,8 @@ class Level:
                                     monster_name,
                                     (x, y),
                                     [self.visible_sprites, self.attackable_sprites],
-                                    self.obstacle_sprites, self.damage_player
+                                    self.obstacle_sprites, self.damage_player,
+                                    self.trigger_death_particles
                                 )
 
     def create_weapon(self):
@@ -115,9 +118,11 @@ class Level:
     def create_spell(self, style, strength, cost):
         """Create a spell and draw it on the screen."""
 
-        print(style)
-        print(strength)
-        print(cost)
+        if style == "heal":
+            self.magic_player.heal(self.player, strength, cost, [self.visible_sprites])
+
+        if style == "flame":
+            self.magic_player.flame(self.player, cost, [self.visible_sprites, self.attack_sprites])
 
     def destroy_spell(self):
         """Remove a spell from the screen."""
@@ -142,8 +147,9 @@ class Level:
                 if target_sprite.sprite_type == "grass":
                     # run particle effect
                     pos = target_sprite.rect.center
-                    self.animation_player.create_grass_particles(pos, [self.visible_sprites])
-                    
+                    offset = pygame.math.Vector2(0, 75)
+                    for _ in range(random.randint(3,6)):
+                        self.animation_player.create_grass_particles(pos - offset, [self.visible_sprites])
                     # destroy the grass
                     target_sprite.kill()
                 else: # must be an enemy
@@ -159,7 +165,16 @@ class Level:
         self.player.vulnerable = False
         self.player.hurt_time = pygame.time.get_ticks()
 
-        # TODO: spawn particles
+        self.animation_player.create_particles(
+            attack_type,
+            self.player.rect.center,
+            [self.visible_sprites]
+        )
+
+    def trigger_death_particles(self, pos, particle_type):
+        """Trigger the particle effects for a monster death."""
+
+        self.animation_player.create_particles(particle_type, pos, [self.visible_sprites])
 
     def run(self):
         """Update and draw the level"""
