@@ -11,7 +11,7 @@ from entity import Entity
 class Enemy(Entity):
     """An enemy in the game."""
 
-    def __init__(self, monster_name, pos, groups, obstacle_sprites, damage_player, trigger_death_particles):
+    def __init__(self, monster_name, pos, groups, obstacle_sprites, damage_player, trigger_death_particles, award_xp):
         super().__init__(groups)
 
         # general setup
@@ -46,6 +46,7 @@ class Enemy(Entity):
         self.attack_cooldown = 400
         self.damage_player = damage_player
         self.trigger_death_particles = trigger_death_particles
+        self.award_xp = award_xp
 
         # invincibility timer
         self.vulnerable = True
@@ -161,6 +162,7 @@ class Enemy(Entity):
         if self.health <= 0:
             self.kill()
             self.trigger_death_particles(self.rect.center, self.monster_name)
+            self.award_xp(self.exp)
 
     def hit_reaction(self):
         """If just attacked, get knocked back."""

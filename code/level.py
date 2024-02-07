@@ -10,7 +10,6 @@ import pygame
 
 from settings import *
 from support import *
-from debug import debug
 from tile import Tile
 from player import Player
 from enemy import Enemy
@@ -18,6 +17,7 @@ from weapon import Weapon
 from ui import UI
 from particles import AnimationPlayer
 from magic import MagicPlayer
+from upgrade import UpgradeMenu
 
 class Level:
     """A level in the game."""
@@ -40,6 +40,8 @@ class Level:
 
         # user interface
         self.ui = UI()
+        self.upgrade_menu = UpgradeMenu(self.player)
+        self.game_paused = False
 
         # particles
         self.animation_player = AnimationPlayer()
@@ -100,7 +102,7 @@ class Level:
                                     (x, y),
                                     [self.visible_sprites, self.attackable_sprites],
                                     self.obstacle_sprites, self.damage_player,
-                                    self.trigger_death_particles
+                                    self.trigger_death_particles, self.award_xp
                                 )
 
     def create_weapon(self):
@@ -176,14 +178,30 @@ class Level:
 
         self.animation_player.create_particles(particle_type, pos, [self.visible_sprites])
 
+    def award_xp(self, amount):
+        """Award the player the specified amount of experience points."""
+
+        self.player.exp += amount
+
+    def toggle_menu(self):
+        """Toggle the game menu."""
+
+        self.game_paused = not self.game_paused
+
     def run(self):
         """Update and draw the level"""
 
         self.visible_sprites.custom_draw(self.player)
-        self.visible_sprites.update()
-        self.visible_sprites.enemy_update(self.player)
-        self.run_attack_logic()
         self.ui.display(self.player)
+
+        if self.game_paused:
+            # display the upgrade menu
+            self.upgrade_menu.display()
+        else:
+            # run the game
+            self.visible_sprites.update()
+            self.visible_sprites.enemy_update(self.player)
+            self.run_attack_logic()
 
 
 class YSortCameraGroup(pygame.sprite.Group):
