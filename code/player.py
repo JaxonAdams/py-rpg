@@ -266,5 +266,5 @@ class Player(Entity):
         self.cooldowns()
         self.set_status()
         self.animate()
-        self.move(self.speed)
+        self.move(self.stats["speed"])
         self.recover_energy()
