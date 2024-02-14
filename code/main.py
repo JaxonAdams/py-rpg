@@ -44,7 +44,7 @@ class Game:
                         self.level.toggle_menu()
                 
             # fill in screen
-            self.screen.fill("black")
+            self.screen.fill(WATER_COLOR)
             # call the current level's run method
             self.level.run()
             # update screen

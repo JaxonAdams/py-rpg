@@ -24,4 +24,5 @@ class Tile(pygame.sprite.Sprite):
             self.rect = self.image.get_rect(topleft=pos)
 
         # custom hit box
-        self.hitbox = self.rect.inflate(0, -10)
+        y_offset = HITBOX_OFFSET[sprite_type]
+        self.hitbox = self.rect.inflate(0, y_offset)
