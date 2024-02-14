@@ -28,6 +28,11 @@ class Game:
         # initialize a new level
         self.level = Level()
 
+        # set up bg music
+        self.music = pygame.mixer.Sound("../audio/main.ogg")
+        self.music.set_volume(0.5)
+        self.music.play(loops=-1)
+
     def run(self):
         """Run the game. Set up a game loop and an event listener."""
 
