@@ -24,5 +24,3 @@ Move your character with the arrow keys on your keyboard. You can cycle through 
 Attack by pressing the spacebar. Spells can be cast with the left control key.
 
 Open the upgrade menu by pressing the `m` key. You can then spend experience points (bottom right of screen) on upgraded stats with the spacebar.
-
-This project was built alongside ClearCode's [youtube tutorial](https://www.youtube.com/watch?v=QU1pPzEGrqw) on pygame.
