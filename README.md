@@ -19,7 +19,7 @@ cd code
 python main.py
 ```
 
-Move your character with the arrow keys on your keyboard. You can cycle through weapons and spells by pressing `q` amd `e` respectively.
+Move your character with the arrow keys on your keyboard. You can cycle through weapons and spells by pressing `q` and `e` respectively.
 
 Attack by pressing the spacebar. Spells can be cast with the left control key.
 
